@@ -1,0 +1,16 @@
+{
+  "name": "wwwroot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "buildcss": "tailwind build ./src/style.css -o ./dist/style.css"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "autoprefixer": "^10.0.2",
+    "tailwindcss": "^1.9.6"
+  }
+}

@@ -1,0 +1,87 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+    inputs:
+      nuget_version:
+        description: 'Override nuget version'
+        default: ''
+      release_notes:
+        description: 'Release notes:'
+        default: 'New version released!'
+
+env:
+  PROJECT_DIR: 'src/MiniDashboard'
+  OUT_DIR: '${{github.workspace}}/out'
+  NUGET_SRC_URL: 'https://api.nuget.org/v3/index.json'
+  NODE_ENV: 'production'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # Set env
+    - name: Get nuget version from GH input
+      if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.nuget_version != '' }}
+      run: echo "VERSION=${{ github.event.inputs.nuget_version }}" >> $GITHUB_ENV
+    
+    - name: Get nuget version from file
+      if: ${{ github.event_name != 'workflow_dispatch' || github.event.inputs.nuget_version == '' }}
+      run: echo "VERSION=$(grep -oP  '<Version>\K\d*.\d*.\d*(?=</Version>)' $PROJECT_DIR/MiniDashboard.csproj)" >> $GITHUB_ENV
+    
+    - name: Set release build nuget version
+      if: ${{ github.event_name == 'workflow_dispatch' }}
+      run: echo "VERSION=$VERSION" >> $GITHUB_ENV
+    
+    - name: Set preview build nuget version
+      if: ${{ github.event_name != 'workflow_dispatch' }}
+      run: echo "VERSION=$VERSION-preview.${{github.run_number}}" >> $GITHUB_ENV
+    
+    - name: Print nuget version
+      run: echo $VERSION
+
+    # Build css
+    - name: Setup node
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - name: Install node_modules
+      run: npm install --prefix $PROJECT_DIR/wwwroot
+    - name: Build css
+      run: npm run buildcss --prefix $PROJECT_DIR/wwwroot
+
+    # Build dashboard
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Install dependencies
+      run: dotnet restore $PROJECT_DIR/MiniDashboard.csproj
+    - name: Build
+      run: dotnet build $PROJECT_DIR/MiniDashboard.csproj --configuration Release --no-restore
+    # - name: Test
+    #   run: dotnet test $PROJECT_DIR/MiniDashboard.csproj --no-restore --verbosity normal
+    - name: Pack nuget
+      run: dotnet pack $PROJECT_DIR/MiniDashboard.csproj --configuration Release --no-restore --no-build --output $OUT_DIR -p:PackageVersion=$VERSION
+    - name: Push nuget
+      run: dotnet nuget push $OUT_DIR/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s $NUGET_SRC_URL
+    
+    # Create release on github
+    - name: Create Release
+      if: ${{ github.event_name == 'workflow_dispatch'}}
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ env.VERSION }}
+        release_name: Release ${{ env.VERSION }}
+        body: ${{ github.event.inputs.release_notes }}
+        draft: false
+        prerelease: false

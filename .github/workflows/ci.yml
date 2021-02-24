@@ -1,0 +1,39 @@
+name: Build
+
+on:
+  pull_request:
+    branches: [ master ]
+
+env:
+  PROJECT_DIR: 'src/MiniDashboard'
+  NODE_ENV: 'production'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # Build css
+    - name: Setup node
+      uses: actions/setup-node@v1
+      with:
+        node-version: 12
+    - name: Install node_modules
+      run: npm install --prefix $PROJECT_DIR/wwwroot
+    - name: Build css
+      run: npm run buildcss --prefix $PROJECT_DIR/wwwroot
+
+    # Build dashboard
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+    - name: Install dependencies
+      run: dotnet restore $PROJECT_DIR/MiniDashboard.csproj
+    - name: Build
+      run: dotnet build $PROJECT_DIR/MiniDashboard.csproj --configuration Release --no-restore
+    # - name: Test
+    #   run: dotnet test $PROJECT_DIR/MiniDashboard.csproj --no-restore --verbosity normal
