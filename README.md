@@ -11,7 +11,7 @@
 </h4>
 
 <p align="center">
-  <a href="https://github.com/jogurtas/MiniDashboard/actions"><img src="https://github.com/jogurtas/MiniDashboard/workflows/Deploy/badge.svg" alt="GitHub Workflow Status"></a>
+  <a href="https://github.com/jogurtas/MiniDashboard/actions"><img src="https://github.com/jogurtas/MiniDashboard/workflows/Deploy/badge.svg" alt="Github Workflow Status"></a>
   <a href="https://www.nuget.org/packages/MiniDashboard/"><img src="https://img.shields.io/nuget/v/MiniDashboard" alt="NuGet"></a>
   <a href="https://github.com/jogurtas/MiniDashboard/blob/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-informational" alt="License"></a>
 </p>
