@@ -6,7 +6,7 @@
         <Version>1.0.0</Version>
         <Authors>jogurtas</Authors>
         <Description>Zero configuration dashboard for .NET</Description>
-        <PackageTags>dash, dashboard, net, gui, minimal, webapi, rest</PackageTags>
+        <PackageTags>dash, dashboard, net, gui, minimal, webapi, rest, stats, chart</PackageTags>
         <RepositoryUrl>https://github.com/jogurtas/MiniDashboard</RepositoryUrl>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageIcon>icon.png</PackageIcon>

@@ -15,14 +15,10 @@
     <script src="thirdparty/handlebars.min.js"></script>
     <script>
         const baseUrl = "{{base_url}}";
-        const loginUrl = "{{login_url}}";
-        const refreshUrl = "{{refresh_url}}";
     </script>
 </head>
 
 <body class="bg-gray-100">
-
-<div id="toolbar-container" class="flex justify-end mt-1 mr-1"></div>
 
 <div id="container" class="container px-2 mx-auto mt-5">
     <!-- STAT CARDS CONTAINER -->
@@ -73,33 +69,6 @@
                 </thead>
                 <tbody class="text-sm font-normal text-gray-700">{{{rows}}}</tbody>
             </table>
-        </div>
-    </div>
-</script>
-
-<!--TOOLBAR ELEMENTS TEMPLATE-->
-<script id="toolbarTpl" type="text/x-handlebars-template">
-    <a href="#" title="logout" id="logout">
-        <svg width="17" height="17" viewBox="0 0 20 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M11 14L12.4 12.6L9.8 10L20 10L20 8L9.8 8L12.4 5.4L11 4L6 9L11 14ZM2 2L10 2L10 8.74228e-07L2 1.57361e-06C0.899998 1.66978e-06 -1.49493e-06 0.900002 -1.39876e-06 2L-1.74846e-07 16C-7.86805e-08 17.1 0.9 18 2 18L10 18L10 16L2 16L2 2Z"
-                  fill="black"/>
-        </svg>
-    </a>
-</script>
-
-<!--LOGIN VIEW TEMPLATE-->
-<script id="loginViewTpl" type="text/x-handlebars-template">
-    <div class="container mx-auto mt-40">
-        <div class="p-5 my-5 bg-white rounded shadow-lg max-w-sm mx-auto">
-            <p class="pb-5 text-2xl font-bold text-gray-800">Login</p>
-            <input id="email" type="email"
-                   class="my-2 w-full py-1 px-4 text-sm text-gray-600 bg-gray-100 border border-gray-300 rounded-lg appearance-none focus:outline-none"
-                   placeholder="Email"/>
-            <input id="password" type="password"
-                   class="my-2 w-full py-1 px-4 text-sm text-gray-600 bg-gray-100 border border-gray-300 rounded-lg appearance-none focus:outline-none"
-                   placeholder="Password"/>
-            <p id="error" class="text-xs font-light text-red-600"></p>
-            <button id="login" class="transition duration-500 ease-in-out bg-green-600 hover:bg-green-700 text-white text-sm py-1 px-3 mt-3 rounded">Login</button>
         </div>
     </div>
 </script>

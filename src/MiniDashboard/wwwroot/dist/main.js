@@ -1,17 +1,8 @@
-﻿let auth = JSON.parse(localStorage.getItem('auth'));
-let withAuth = loginUrl !== "null";
-
-if (withAuth && auth === null) {
-    renderLoginView();
-} else {
-    console.log(baseUrl);
-    get(baseUrl, function (res) {
-        renderToolbar(withAuth);
-        renderCards(res.cards);
-        renderTables(res.tables);
-        renderCharts(res.charts);
-    }, withAuth);
-}
+﻿get(baseUrl, function (res) {
+    renderCards(res.cards);
+    renderTables(res.tables);
+    renderCharts(res.charts);
+});
 
 function renderCards(cards) {
     const statCardTpl = Handlebars.compile($("#statCardTpl").html());
@@ -106,7 +97,6 @@ function createChart(type, id, data) {
             pointRadius: 0,
             lineTension: 0,
             borderWidth: 2,
-            borderColor: "#a8e0ba",
             fill: true,
             backgroundColor: 'rgba(0, 219, 117, 0.2)',
             borderColor: "#a8e0ba",
@@ -125,8 +115,7 @@ function createChart(type, id, data) {
                 pointRadius: 0,
                 lineTension: 0,
                 borderWidth: 2,
-                borderColor: "#a8e0ba",
-                fill: type === 'line' ? false : true,
+                fill: type !== 'line',
                 backgroundColor: 'rgba(0, 219, 117, 0.2)',
                 borderColor: (type === 'pie' || type === 'doughnut') && chartData.label.length < 10 ? [] : "#a8e0ba",
             });
@@ -174,76 +163,11 @@ function createChart(type, id, data) {
     });
 }
 
-function renderToolbar() {
-    if (!withAuth) return;
-
-    const toolbarTpl = Handlebars.compile($("#toolbarTpl").html());
-
-    $(document).ready(() => {
-        $("#logout").click(() => {
-            localStorage.clear();
-            window.location.reload();
-        });
-    });
-
-    $('#toolbar-container').append(toolbarTpl());
-}
-
-function renderLoginView(withAuth) {
-    const loginViewTpl = Handlebars.compile($("#loginViewTpl").html());
-
-    $(document).ready(() => {
-        $("#login").click(() => {
-            const errMsgElement = $("#error");
-            errMsgElement.text("");
-
-            post(loginUrl, {
-                email: $("#email").val(),
-                password: $("#password").val(),
-            }, function (res) {
-                try {
-                    localStorage.setItem("auth", JSON.stringify({
-                        accessToken: res.accessToken,
-                        refreshToken: res.refreshToken,
-                        expires: JSON.parse(atob(res.accessToken.split('.')[1])).exp,
-                    }));
-                    window.location.reload();
-                } catch (e) {
-                    console.error("Failed to parse access token", e);
-                }
-            }, function (xhr, status, error) {
-                errMsgElement.text(error);
-            });
-        });
-    });
-
-    $('body').prepend(loginViewTpl());
-}
-
 // UTILS
-function post(url, data, onSuccess, onError) {
-    return jQuery.ajax({
-        headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-        },
-        'type': 'POST',
-        'url': url,
-        'data': JSON.stringify(data),
-        'dataType': 'json',
-        'cache': false,
-        'success': onSuccess,
-        'error': onError
-    });
-}
-
 function get(url, onSuccess) {
-    if (withAuth) refreshTokenIfExpired();
-
     return jQuery.ajax({
         headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${auth?.accessToken}`
         },
         'cache': false,
         'type': 'GET',
@@ -253,32 +177,6 @@ function get(url, onSuccess) {
             console.error(error);
         }
     });
-}
-
-function refreshTokenIfExpired() {
-    const refreshAt = auth.expires - 2 * 60 * 1000;
-
-    if (Date.now() >= refreshAt) {
-        post(refreshUrl, {
-            refreshToken: auth.refreshToken,
-            expiredAccessToken: auth.accessToken,
-        }, function (res) {
-            // TODO: move to function
-            try {
-                auth = {
-                    accessToken: res.accessToken,
-                    refreshToken: res.refreshToken,
-                    expires: JSON.parse(atob(res.accessToken.split('.')[1])).exp,
-                };
-                localStorage.setItem("auth", JSON.stringify(auth));
-                console.log("Token refreshed");
-            } catch (e) {
-                console.error("Failed to parse access token", e);
-            }
-        }, function () {
-            console.error("Failed to refresh access token");
-        });
-    }
 }
 
 function blankTab(data) {

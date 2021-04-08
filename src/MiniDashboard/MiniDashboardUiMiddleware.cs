@@ -55,10 +55,7 @@ namespace MiniDashboard
                 await using var stream = typeof(MiniDashboardMiddleware).GetTypeInfo().Assembly.GetManifestResourceStream($"{EmbeddedFileNamespace}.index.html");
                 var htmlBuilder = await new StreamReader(stream).ReadToEndAsync();
 
-                htmlBuilder = htmlBuilder
-                    .Replace("{{base_url}}", MiniDashboardMiddleware.Cfg.Route)
-                    .Replace("{{login_url}}", MiniDashboardMiddleware.Cfg.LoginRoute)
-                    .Replace("{{refresh_url}}", MiniDashboardMiddleware.Cfg.RefreshRoute);
+                htmlBuilder = htmlBuilder.Replace("{{base_url}}", MiniDashboardMiddleware.Cfg.Route);
 
                 await response.WriteAsync(htmlBuilder, Encoding.UTF8);
                 return;

@@ -28,6 +28,7 @@
   - [Charts](#charts)
   - [Tables](#tables)
   - [Routes](#routes)
+  - [Authentication](#authentication)
 
 
 ## 🔧 Installation
@@ -84,14 +85,14 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 {
     app.UseEndpoints(endpoints => 
     { 
-        endpoints.MapControllers(cfg => 
+        endpoints.MapControllers();
+        endpoints.MapMiniDashboard(cfg => 
         {
             cfg
                 .EnrichWithStaticCard(title: "Branch", value: "master", data: "Some data (optional)")
                 // Data will be dynamically evaluated on dashboard refresh or on card click
                 .EnrichWithDynamicCard(title: "Dynamic", value: "Number", onUpdate: () => new Random().Next(1000).ToString());
         });
-        endpoints.MapMiniDashboard();
     });
 
     app.UseMiniDashboardUi();
@@ -107,11 +108,11 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 
     app.UseEndpoints(endpoints => 
     { 
-        endpoints.MapControllers(cfg => 
+        endpoints.MapControllers();
+        endpoints.MapMiniDashboard(cfg => 
         {
             cfg.EnrichWithChart(title: "Weather", type: ChartType.Line, WeatherChart.SampleWeatherData);
         });
-        endpoints.MapMiniDashboard();
     });
 
     app.UseMiniDashboardUi();
@@ -158,11 +159,11 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 
     app.UseEndpoints(endpoints => 
     { 
-        endpoints.MapControllers(cfg => 
+        endpoints.MapControllers();
+        endpoints.MapMiniDashboard(cfg => 
         {
             cfg.EnrichWithTable(title: "Weather", WeatherChart.SampleWeatherData);
         });
-        endpoints.MapMiniDashboard();
     });
 
     app.UseMiniDashboardUi();
@@ -214,16 +215,51 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 
     app.UseEndpoints(endpoints => 
     { 
-        endpoints.MapControllers(cfg => 
+        endpoints.MapControllers();
+        endpoints.MapMiniDashboard(cfg => 
         {
             cfg.Route = "/data"; // Data
         });
-        endpoints.MapMiniDashboard();
     });
 
     app.UseMiniDashboardUi(cfg =>
     {
         cfg.Route = "/dashboard"; // UI
     });
+}
+```
+
+### Authentication
+
+Currently `MiniDashboard` supports [Basic authentication](https://tools.ietf.org/html/rfc7617).
+
+```json
+// appsettings.json
+{
+    // ...
+    "DashAuthSecrets": {
+        "username": "admin",
+        "password": "secure_password"
+    }
+}
+```
+
+```c#
+// Load credentials
+public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+{
+    // ...
+
+    app.UseEndpoints(endpoints => 
+    { 
+        endpoints.MapControllers();
+        endpoints.MapMiniDashboard(cfg => 
+        {
+            cfg.BasicAuthUserName = Configuration.GetValue<string>("DashAuthSecrets:username");
+            cfg.BasicAuthPassword = Configuration.GetValue<string>("DashAuthSecrets:password");
+        });
+    });
+
+    app.UseMiniDashboardUi();
 }
 ```

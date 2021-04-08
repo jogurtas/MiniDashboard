@@ -19,8 +19,9 @@ namespace MiniDashboard.Cfg
             }
         }
 
-        public string LoginRoute { get; set; }
-        public string RefreshRoute { get; set; }
+        public string BasicAuthUserName { get; set; }
+
+        public string BasicAuthPassword { get; set; }
 
         private readonly List<Card> _cards = new();
         public IList<Card> Cards => _cards.AsReadOnly();
